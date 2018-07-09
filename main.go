@@ -21,7 +21,7 @@ func main() {
 	router.HandleFunc("/", index).Methods("GET")
 	router.HandleFunc("/user", getUsers).Methods("GET")
 	router.HandleFunc("/user/{id:[0-9]+}", getUser).Methods("GET")
-	router.HandleFunc("/user/{id:[0-9]+}", createUser).Methods("POST")
+	router.HandleFunc("/user", createUser).Methods("POST")
 	router.HandleFunc("/user/{id:[0-9]+}", updateUser).Methods("PUT")
 	router.HandleFunc("/user/{id:[0-9]+}", deleteUser).Methods("DELETE")
 	router.Use(loggingMiddleware)
@@ -44,7 +44,9 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Not Implemented")
+	vars := mux.Vars(r)
+	userID := vars["id"]
+	fmt.Fprintln(w, "Here is user with ID:", userID)
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
@@ -52,9 +54,13 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Not Implemented")
+	vars := mux.Vars(r)
+	userID := vars["id"]
+	fmt.Fprintln(w, "Updated user with ID:", userID)
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Not Implemented")
+	vars := mux.Vars(r)
+	userID := vars["id"]
+	fmt.Fprintln(w, "Deleted user with ID:", userID)
 }
