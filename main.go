@@ -24,7 +24,15 @@ func main() {
 	router.HandleFunc("/user/{id:[0-9]+}", createUser).Methods("POST")
 	router.HandleFunc("/user/{id:[0-9]+}", updateUser).Methods("PUT")
 	router.HandleFunc("/user/{id:[0-9]+}", deleteUser).Methods("DELETE")
+	router.Use(loggingMiddleware)
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("DEMO_PORT"), router))
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RequestURI, r.Method, r.UserAgent())
+		next.ServeHTTP(w, r)
+	})
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
