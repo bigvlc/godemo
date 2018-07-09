@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,6 +16,8 @@ type user struct {
 	LastName  string `json:"lastname"`
 	Age       string `json:"age"`
 }
+
+type users []user
 
 func main() {
 	router := mux.NewRouter()
@@ -36,11 +39,30 @@ func loggingMiddleware(next http.Handler) http.Handler {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Welcome to Demo API")
+	i := "Welcome to Demo API"
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(i)
 }
 
 func getUsers(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Not implemented")
+	u := users{
+		user{
+			ID:        "1",
+			FirstName: "FirstName01",
+			LastName:  "LastName01",
+			Age:       "28",
+		},
+		user{
+			ID:        "2",
+			FirstName: "FirstName02",
+			LastName:  "LastName02",
+			Age:       "33",
+		},
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(u)
 }
 
 func getUser(w http.ResponseWriter, r *http.Request) {
