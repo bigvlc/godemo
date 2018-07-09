@@ -10,17 +10,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type user struct {
+// User struct
+type User struct {
 	ID        string `json:"id"`
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
 	Age       string `json:"age"`
 }
 
-type users []user
+var users []User
 
 func main() {
 	router := mux.NewRouter()
+	// sample data
+	users = append(users, User{ID: "1", FirstName: "FirstName01", LastName: "LastName01", Age: "28"})
+	users = append(users, User{ID: "2", FirstName: "FirstName02", LastName: "LastName02", Age: "33"})
 	router.HandleFunc("/", index).Methods("GET")
 	router.HandleFunc("/user", getUsers).Methods("GET")
 	router.HandleFunc("/user/{id:[0-9]+}", getUser).Methods("GET")
@@ -46,29 +50,23 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUsers(w http.ResponseWriter, r *http.Request) {
-	u := users{
-		user{
-			ID:        "1",
-			FirstName: "FirstName01",
-			LastName:  "LastName01",
-			Age:       "28",
-		},
-		user{
-			ID:        "2",
-			FirstName: "FirstName02",
-			LastName:  "LastName02",
-			Age:       "33",
-		},
-	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(u)
+	json.NewEncoder(w).Encode(users)
 }
 
 func getUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	userID := vars["id"]
-	fmt.Fprintln(w, "Here is user with ID:", userID)
+	for _, i := range users {
+		if i.ID == vars["id"] {
+			json.NewEncoder(w).Encode(i)
+			return
+		}
+	}
+	// Add Not found 404 if ID does not exists
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&users)
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
