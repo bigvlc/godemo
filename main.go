@@ -28,7 +28,7 @@ func main() {
 	router.HandleFunc("/", index).Methods("GET")
 	router.HandleFunc("/user", getUsers).Methods("GET")
 	router.HandleFunc("/user/{id:[0-9]+}", getUser).Methods("GET")
-	router.HandleFunc("/user", createUser).Methods("POST")
+	router.HandleFunc("/user/{id:[0-9]+}", createUser).Methods("POST")
 	router.HandleFunc("/user/{id:[0-9]+}", updateUser).Methods("PUT")
 	router.HandleFunc("/user/{id:[0-9]+}", deleteUser).Methods("DELETE")
 	router.Use(loggingMiddleware)
@@ -70,7 +70,14 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Not Implemented")
+	vars := mux.Vars(r)
+	var user User
+	_ = json.NewDecoder(r.Body).Decode(&user)
+	user.ID = vars["id"]
+	users = append(users, user)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(users)
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
